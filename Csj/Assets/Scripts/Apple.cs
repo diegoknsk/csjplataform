@@ -7,7 +7,7 @@ public class Apple : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //add + 1 maca, destroi depois
-        collision.GetComponent<Player>().apple++;
+        collision.GetComponent<Player>().IncreaseScore();
         Destroy(gameObject);
     }
 }

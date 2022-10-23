@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
+    [Header("Atributtes")]
     public float speed;
     public float jumpForce;
     public int life;
     public int apple;
+
+    [Header("Components")]
     public Rigidbody2D rig;
     public Animator anim;
     private Vector2 direction;
@@ -15,11 +20,18 @@ public class Player : MonoBehaviour
     public SpriteRenderer sprite;
     private bool recovery;
 
+    [Header("UI")]
+    public TextMeshProUGUI appleText;
+    public TextMeshProUGUI lifeText;
+    public GameObject gameOver;
+
+
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        lifeText.text = life.ToString();
+        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
@@ -53,7 +65,17 @@ public class Player : MonoBehaviour
 
     void Death() 
     {
+        if (life <= 0) 
+        {
+            gameOver.SetActive(true);
+            Time.timeScale = 0;
+        }
+    }
 
+    public void RestartGame() 
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Time.timeScale = 1;
     }
 
     void PlayAnim() 
@@ -80,12 +102,14 @@ public class Player : MonoBehaviour
     public void Hit() 
     {
         if (!recovery)
-        {         
+        {
+            DecreaseLife();
             StartCoroutine(Flick());
+            Death();
         }
     }
 
-    IEnumerator Flick() 
+    IEnumerator Flick()
     {
         recovery = true;
         sprite.color = new Color(1, 1, 1, 0);
@@ -96,8 +120,20 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         sprite.color = new Color(1, 1, 1, 1);
         yield return new WaitForSeconds(0.2f);
-        life--;
+     
         recovery = false;
+    }
+
+    private void DecreaseLife()
+    {
+        life--;
+        lifeText.text = life.ToString();
+    }
+
+    public void IncreaseScore() 
+    {
+        apple++;
+        appleText.text = apple.ToString();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
